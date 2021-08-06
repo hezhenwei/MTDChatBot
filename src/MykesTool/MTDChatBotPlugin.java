@@ -10,6 +10,7 @@ import mindustry.mod.*;
 import mindustry.net.Administration.*;
 import mindustry.world.blocks.storage.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
@@ -114,17 +115,20 @@ public class MTDChatBotPlugin extends Plugin{
                 Log.info(nBotNamePos);
                 if( nBotNamePos == 0)
                 {
-                    String strAsk = text.substring(strCallName.length()+1);
-                    String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg="+strAsk;
+                    String strAsk = text.substring(strCallName.length());
+                    String strEncodedAsk = java.net.URLEncoder.encode(strAsk, Charset.forName("utf-8"));
+                    String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg="+strEncodedAsk;
                     String strReply = doGet(strURL);
+                    //Log.info(m_strLogPrefix+strAsk);
+                    //Log.info(m_strLogPrefix+strEncodedAsk);
 
                     Log.info(strReply);
                     //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
                     //JSONObject json_test = JSONObject.fromObject(strReply);
                         final JSONObject jsonResult = new JSONObject(strReply);
 
-                        Log.info(m_strLogPrefix+jsonResult.getInt("result"));
-                        Log.info(m_strLogPrefix+jsonResult.getString("content"));
+                        //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
+                        //Log.info(m_strLogPrefix+jsonResult.getString("content"));
                         if (0 == jsonResult.getInt("result")) {
                             //Groups.player.find();
                             player.sendMessage(jsonResult.getString("content"));
