@@ -24,6 +24,8 @@ for example "@myke what do you like"
 
 Output jar should be in `build/libs`.
 
+Comments
+use http://api.qingyunke.com/ as API provider.
 
 ## todo
 I don't know
