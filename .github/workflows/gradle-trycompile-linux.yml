@@ -23,7 +23,7 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      name: Make gradlew executable
+    - name: Make gradlew executable
       run: chmod +x ./gradlew
 
     - name: Build with Gradle

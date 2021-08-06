@@ -13,11 +13,12 @@ jobs:
       with:
         java-version: 16
 
-      name: Make gradlew executable
+    - name: Make gradlew executable
       run: chmod +x ./gradlew
 
     - name: Build plugin jar
       run: ./gradlew jar
+
     - name: Upload built jar file
       uses: actions/upload-artifact@v2
       with:
