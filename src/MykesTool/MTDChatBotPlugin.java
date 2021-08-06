@@ -11,6 +11,7 @@ import mindustry.net.Administration.*;
 import mindustry.world.blocks.storage.*;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
@@ -21,6 +22,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONObject;
 import org.json.JSONObject;
@@ -50,9 +52,9 @@ public class MTDChatBotPlugin extends Plugin{
             if (connection.getResponseCode() == 200) {
                 is = connection.getInputStream();
                 // 封装输入流is，并指定字符集
-                br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 // 存放数据
-                StringBuffer sbf = new StringBuffer();
+                StringBuilder sbf = new StringBuilder();
                 String temp = null;
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);
@@ -116,7 +118,7 @@ public class MTDChatBotPlugin extends Plugin{
                 if( nBotNamePos == 0)
                 {
                     String strAsk = text.substring(strCallName.length());
-                    String strEncodedAsk = java.net.URLEncoder.encode(strAsk, Charset.forName("utf-8"));
+                    String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
                     String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg="+strEncodedAsk;
                     String strReply = doGet(strURL);
                     //Log.info(m_strLogPrefix+strAsk);
