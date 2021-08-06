@@ -1,9 +1,9 @@
 package MykesTool;
 
-import arc.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.NetClient;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
@@ -23,8 +23,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONObject;
 import org.json.JSONObject;
 
 public class MTDChatBotPlugin extends Plugin{
@@ -91,9 +89,11 @@ public class MTDChatBotPlugin extends Plugin{
     }
 
     private String m_strLogPrefix = "[MykesTool:ChatBot]";
+    private NetClient m_nc;
+    private Player m_pNew;
     //called when game initializes
     @Override
-    public void init(){
+    public void init() {
         /*
         //listen for a block selection event
         Events.on(BuildSelectEvent.class, event -> {
@@ -107,37 +107,70 @@ public class MTDChatBotPlugin extends Plugin{
         });
         */
 
+        //Events.on(Event.class, event -> {
+        /*
+        m_pNew = Player.create();
+        m_pNew.name = "asdf";
+        m_pNew.admin = true;
+        m_pNew.id = 123;
+
+        Groups.player.add(m_pNew);
+
+        m_nc = new NetClient();
+        m_nc.init();
+        m_nc.beginConnecting();
+        */
+
+
         //add a chat filter that changes the contents of all messages
         //in this case, all instances of "heck" are censored
-        Vars.netServer.admins.addChatFilter((player, text) -> {
-                int nBotNamePos = -1;
-                String strCallName = "@myke";
-                nBotNamePos = text.indexOf(strCallName);
-                Log.info(text);
-                Log.info(nBotNamePos);
-                if( nBotNamePos == 0)
-                {
-                    String strAsk = text.substring(strCallName.length());
-                    String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
-                    String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg="+strEncodedAsk;
-                    String strReply = doGet(strURL);
-                    //Log.info(m_strLogPrefix+strAsk);
-                    //Log.info(m_strLogPrefix+strEncodedAsk);
+        Vars.netServer.admins.addChatFilter((player, text) ->  {
+/*
+            if(m_pNew == null || m_nc == null) {
+                m_nc = new NetClient();
+                //m_nc.
+                m_nc.init();
+                m_nc.beginConnecting();
 
-                    Log.info(strReply);
-                    //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
-                    //JSONObject json_test = JSONObject.fromObject(strReply);
-                        final JSONObject jsonResult = new JSONObject(strReply);
+                m_pNew = Player.create();
+                m_pNew.name = "asdf";
+                m_pNew.admin = true;
+                m_pNew.id = 123;
+                //m_pNew.locale = packet.locale;
+                //m_pNew.color.set(packet.color).a(1f);
+                Vars.netServer.sendWorldData(player);
+            }
+*/
 
-                        //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
-                        //Log.info(m_strLogPrefix+jsonResult.getString("content"));
-                        if (0 == jsonResult.getInt("result")) {
-                            //Groups.player.find();
-                            player.sendMessage(jsonResult.getString("content"));
-                        } else {
-                            Log.info(m_strLogPrefix+" error getting message.");
-                        }
+            int nBotNamePos = -1;
+            String strCallName = "@myke";
+            nBotNamePos = text.indexOf(strCallName);
+            //Log.info(text);
+            //Log.info(nBotNamePos);
+            if (nBotNamePos == 0) {
+                String strAsk = text.substring(strCallName.length());
+                String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
+                String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
+                String strReply = doGet(strURL);
+                //Log.info(m_strLogPrefix+strAsk);
+                //Log.info(m_strLogPrefix+strEncodedAsk);
+
+                Log.info(strReply);
+                //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
+                //JSONObject json_test = JSONObject.fromObject(strReply);
+                final JSONObject jsonResult = new JSONObject(strReply);
+
+                //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
+                //Log.info(m_strLogPrefix+jsonResult.getString("content"));
+                if (0 == jsonResult.getInt("result")) {
+                    //Groups.player.find();
+                    String strContent = jsonResult.getString("content");
+                    String strFormattedContent = strContent.replace("{br}", "\n");
+                    player.sendMessage(strFormattedContent);
+                } else {
+                    Log.info(m_strLogPrefix + " error getting message.");
                 }
+            }
             //player.sendMessage("try to do something for v008");
             return text;
         });
@@ -155,9 +188,9 @@ public class MTDChatBotPlugin extends Plugin{
         });
 
          */
-    }
 
-    //register commands that run on the server
+
+        //register commands that run on the server
     /* // sample
     @Override
     public void registerServerCommands(CommandHandler handler){
@@ -174,6 +207,7 @@ public class MTDChatBotPlugin extends Plugin{
         });
     }
     */
+    }
 
     @Override
     public void registerServerCommands(CommandHandler handler){
