@@ -95,6 +95,47 @@ public class MTDChatBotPlugin extends Plugin{
     private String m_strBotName = "myke";
     private NetClient m_nc;
     private Player m_playerNew;
+    private int m_nDebug = 0;
+    private void DelayReply(Player player, String strMsg){
+
+        int nBotNamePos = -1;
+        String strCallName = "@" + m_strBotName;
+        String strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]][white]";
+        nBotNamePos = strMsg.indexOf(strCallName);
+        //Log.info(text);
+        //Log.info(nBotNamePos);
+        if (nBotNamePos == 0) {
+            String strAsk = strMsg.substring(strCallName.length());
+            String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
+            String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
+            String strReply = doGet(strURL);
+            //Log.info(m_strLogPrefix+strAsk);
+            //Log.info(m_strLogPrefix+strEncodedAsk);
+
+            if( m_nDebug == 1) {
+                Log.info(strReply);
+            }
+            //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
+            //JSONObject json_test = JSONObject.fromObject(strReply);
+            final JSONObject jsonResult = new JSONObject(strReply);
+
+            //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
+            //Log.info(m_strLogPrefix+jsonResult.getString("content"));
+            if (0 == jsonResult.getInt("result")) {
+                //Groups.player.find();
+                String strContent = jsonResult.getString("content");
+                String strFormattedContent = strContent.replace("{br}", "\n");
+                player.sendMessage(strMsgPrefix + strFormattedContent);
+
+                //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
+                //text = text + "\n" + strMsgPrefix + strFormattedContent;
+            } else {
+                Log.info(m_strLogPrefix + " error getting message.");
+            }
+        }
+    }
+
+
     //called when game initializes
     @Override
     public void init() {
@@ -121,43 +162,29 @@ public class MTDChatBotPlugin extends Plugin{
             player.sendMessage("test", m_playerNew);
             */
 
+            Time.run(0, () -> DelayReply(player,text));
 
-            int nBotNamePos = -1;
-            String strCallName = "@" + m_strBotName;
-            String strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]][white]";
-            nBotNamePos = text.indexOf(strCallName);
-            //Log.info(text);
-            //Log.info(nBotNamePos);
-            if (nBotNamePos == 0) {
-                String strAsk = text.substring(strCallName.length());
-                String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
-                String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
-                String strReply = doGet(strURL);
-                //Log.info(m_strLogPrefix+strAsk);
-                //Log.info(m_strLogPrefix+strEncodedAsk);
-
-                Log.info(strReply);
-                //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
-                //JSONObject json_test = JSONObject.fromObject(strReply);
-                final JSONObject jsonResult = new JSONObject(strReply);
-
-                //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
-                //Log.info(m_strLogPrefix+jsonResult.getString("content"));
-                if (0 == jsonResult.getInt("result")) {
-                    //Groups.player.find();
-                    String strContent = jsonResult.getString("content");
-                    String strFormattedContent = strContent.replace("{br}", "\n");
-                    //player.sendMessage(strMsgPrefix + strFormattedContent);
-                    text = text + "\n" + strMsgPrefix + strFormattedContent;
-                } else {
-                    Log.info(m_strLogPrefix + " error getting message.");
-                }
-            }
             //player.sendMessage("try to do something for v008");
             return text;
         });
     }
 
 
+    @Override
+    public void registerServerCommands(CommandHandler handler){
+        handler.register("chatbotdebug", "turn on/off debug info.", args -> {
+            if( m_nDebug == 0) {
+                m_nDebug = 1;
+                Log.info("ChatBotDebugInfo turned on");
+            }
+            else
+            {
+                m_nDebug = 0;
+                Log.info("ChatBotDebugInfo turned off");
+
+            }
+
+        });
+    }
 
 }
