@@ -1,6 +1,8 @@
 package MykesTool;
 
+import arc.*;
 import arc.graphics.Color;
+import arc.math.Mathf;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -85,7 +87,9 @@ public class MTDChatBotPlugin extends Plugin{
                 }
             }
 
-            connection.disconnect();// 关闭远程连接
+            if( connection!= null) {
+                connection.disconnect();// 关闭远程连接
+            }
         }
 
         return result;
@@ -96,6 +100,8 @@ public class MTDChatBotPlugin extends Plugin{
     private NetClient m_nc;
     private Player m_playerNew;
     private int m_nDebug = 0;
+    private int m_nLessPeopleActive = 1;
+    private long m_nLastChatTime = 0;
     private void DelayReply(Player player, String strMsg){
 
         int nBotNamePos = -1;
@@ -106,7 +112,7 @@ public class MTDChatBotPlugin extends Plugin{
         //Log.info(nBotNamePos);
         if (nBotNamePos == 0) {
             String strAsk = strMsg.substring(strCallName.length());
-            String strEncodedAsk = URLEncoder.encode(strAsk, Charset.forName("utf-8"));
+            String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
             String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
             String strReply = doGet(strURL);
             //Log.info(m_strLogPrefix+strAsk);
@@ -133,6 +139,44 @@ public class MTDChatBotPlugin extends Plugin{
             } else {
                 Log.info(m_strLogPrefix + " error getting message.");
             }
+            m_nLastChatTime = System.currentTimeMillis( );
+        } // if has "@myke" prefix
+        else
+        {
+            if( Groups.player.size()<= m_nLessPeopleActive)
+            {
+                String strAsk = strMsg;
+                String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
+                String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
+                String strReply = doGet(strURL);
+                //Log.info(m_strLogPrefix+strAsk);
+                //Log.info(m_strLogPrefix+strEncodedAsk);
+
+                if( m_nDebug == 1) {
+                    Log.info(strReply);
+                }
+                //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
+                //JSONObject json_test = JSONObject.fromObject(strReply);
+                final JSONObject jsonResult = new JSONObject(strReply);
+
+                //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
+                //Log.info(m_strLogPrefix+jsonResult.getString("content"));
+                if (0 == jsonResult.getInt("result")) {
+                    //Groups.player.find();
+                    String strContent = jsonResult.getString("content");
+                    String strFormattedContent = strContent.replace("{br}", "\n");
+                    //player.sendMessage(strMsgPrefix + strFormattedContent); // say to asker.
+                    Call.sendMessage(strMsgPrefix + strFormattedContent); // say to all
+
+                    //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
+                    //text = text + "\n" + strMsgPrefix + strFormattedContent;
+                } else {
+                    Log.info(m_strLogPrefix + " error getting message.");
+                }
+                m_nLastChatTime = System.currentTimeMillis( );
+
+            }
+
         }
     }
 
@@ -168,6 +212,41 @@ public class MTDChatBotPlugin extends Plugin{
             //player.sendMessage("try to do something for v008");
             return text;
         });
+
+        //listen for a user join event
+        Events.on(PlayerJoin.class, event -> {
+            if(m_nDebug==1)
+            {
+                Log.info("[Myke's ChatBot] Player joined. player "+Groups.player.size()+":"+m_nLessPeopleActive);
+            }
+            if( Groups.player.size() <= m_nLessPeopleActive)
+            {
+                // not * 60 is 1 sec
+                // if has very few people, say hi hiddenly
+                Time.run(Mathf.random(10) * 60f, () -> DelayReply(event.player, "hi"));
+            }
+
+        });
+
+        Vars.netServer.admins.addActionFilter(action -> {
+
+            // when user do any action
+            long nNow = System.currentTimeMillis( );
+            long nDiff = nNow - m_nLastChatTime;
+            //Log.info("ndeiff." +  nDiff);
+            if( nDiff > (30+Mathf.random(30)) * 1000)
+            {
+                if( Groups.player.size() <= m_nLessPeopleActive && Groups.player.size() > 0) {
+                    m_nLastChatTime = System.currentTimeMillis( );
+                    int nPlayer = Mathf.random(Groups.player.size()-1);
+                    Player player = Groups.player.index(nPlayer);
+                    Time.run(Mathf.random(10) * 60f, () -> DelayReply(player, "随便说点什么吧。"));
+                }
+            }
+            return true;
+        });
+
+
     }
 
 
@@ -183,6 +262,35 @@ public class MTDChatBotPlugin extends Plugin{
                 m_nDebug = 0;
                 Log.info("ChatBotDebugInfo turned off");
 
+            }
+            /*
+            // test what is time.run // * 60 means a sec
+            Time.run(0, () -> Call.sendMessage("call in 0"));
+            Time.run(10, () -> Call.sendMessage("call in 10"));
+            Time.run(100, () -> Call.sendMessage("call in 100"));
+            Time.run(1000, () -> Call.sendMessage("call in 1000"));
+            */
+
+        });
+        handler.register("chatbotLessPeopleActive", "allow limit.", args -> {
+            if( args.length >= 1) {
+                m_nLessPeopleActive = Integer.getInteger(args[0]);
+                Log.info("LessPeopleActive set to " + m_nLessPeopleActive);
+            }
+            else
+            {
+                Log.info("No args. Guess you want to toggle. ");
+                if( m_nLessPeopleActive == 0)
+                {
+                    m_nLessPeopleActive = 2;
+                    Log.info("Toggle LessPeopleActive to " + m_nLessPeopleActive);
+
+                }else
+                {
+                    m_nLessPeopleActive = 0;
+                    Log.info("Toggle LessPeopleActive to " + m_nLessPeopleActive);
+
+                }
             }
 
         });
