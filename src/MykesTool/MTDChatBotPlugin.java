@@ -106,7 +106,7 @@ public class MTDChatBotPlugin extends Plugin{
 
         int nBotNamePos = -1;
         String strCallName = "@" + m_strBotName;
-        String strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]][white]:";
+        String strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]]:[white] ";
         nBotNamePos = strMsg.indexOf(strCallName);
         //Log.info(text);
         //Log.info(nBotNamePos);
@@ -133,6 +133,7 @@ public class MTDChatBotPlugin extends Plugin{
                 String strFormattedContent = strContent.replace("{br}", "\n");
                 //player.sendMessage(strMsgPrefix + strFormattedContent); // say to asker.
                 Call.sendMessage(strMsgPrefix + strFormattedContent); // say to all
+                Log.info(strMsgPrefix + strFormattedContent); // log this so we can trace back
 
                 //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
                 //text = text + "\n" + strMsgPrefix + strFormattedContent;
@@ -167,6 +168,7 @@ public class MTDChatBotPlugin extends Plugin{
                     String strFormattedContent = strContent.replace("{br}", "\n");
                     //player.sendMessage(strMsgPrefix + strFormattedContent); // say to asker.
                     Call.sendMessage(strMsgPrefix + strFormattedContent); // say to all
+                    Log.info(strMsgPrefix + strFormattedContent); // log this so we can trace back
 
                     //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
                     //text = text + "\n" + strMsgPrefix + strFormattedContent;
