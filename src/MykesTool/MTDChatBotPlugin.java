@@ -254,7 +254,7 @@ public class MTDChatBotPlugin extends Plugin{
 
     @Override
     public void registerServerCommands(CommandHandler handler){
-        handler.register("chatbotdebug", "turn on/off debug info.", args -> {
+        handler.register("cbdebug", "turn on/off debug info.", args -> {
             if( m_nDebug == 0) {
                 m_nDebug = 1;
                 Log.info("ChatBotDebugInfo turned on");
@@ -274,7 +274,7 @@ public class MTDChatBotPlugin extends Plugin{
             */
 
         });
-        handler.register("chatbotLessPeopleActive", "allow limit.", args -> {
+        handler.register("cbnact", "allow limit less then n peoplez.", args -> {
             if( args.length >= 1) {
                 m_nLessPeopleActive = Integer.getInteger(args[0]);
                 Log.info("LessPeopleActive set to " + m_nLessPeopleActive);

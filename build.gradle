@@ -1,6 +1,6 @@
 apply plugin: "java"
 
-version '0.0.7'
+version '0.0.8'
 
 sourceCompatibility = 10
 
@@ -22,8 +22,8 @@ ext{
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    compileOnly "org.json:json:20160810"
-    runtimeOnly "org.json:json:20160810"
+    compileOnly 'org.json:json:20210307'
+    runtimeOnly 'org.json:json:20210307'
     //"com.alibaba:fastjson:1.2.47"
 }
 
