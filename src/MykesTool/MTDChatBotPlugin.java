@@ -67,8 +67,16 @@ public class MTDChatBotPlugin extends Plugin{
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            Log.info("try continue");
+        } catch (java.net.SocketTimeoutException e){
+            e.printStackTrace();
+            Log.info("try continue");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.info("try continue");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.info("try continue");
         } finally {
             // 关闭资源
             if (null != br) {
@@ -76,6 +84,10 @@ public class MTDChatBotPlugin extends Plugin{
                     br.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Log.info("try continue");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.info("try continue");
                 }
             }
 
@@ -84,6 +96,9 @@ public class MTDChatBotPlugin extends Plugin{
                     is.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.info("try continue");
                 }
             }
 
