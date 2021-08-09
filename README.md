@@ -6,7 +6,8 @@ say something start with "@myke"
 for example "@myke what do you like"
 
 ### Installing
-
+Download here:<br/>
+https://github.com/hezhenwei/MTDChatBot/releases/download/v0.1.0/MTDChatBot-0.1.0.jar <br/>
 Simply place the .jar file
 in your server's `config/mods` directory.<br />
 Then restart the server. Now it works.<br />

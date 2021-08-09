@@ -109,6 +109,7 @@ public class MTDChatBotPlugin extends Plugin{
 
         return result;
     }
+
     private String AskAndGetReplyContent(String strAsk)
     {
         String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
@@ -148,7 +149,7 @@ public class MTDChatBotPlugin extends Plugin{
     private int m_nDebug = 0;
     private int m_nLessPeopleActive = 1;
     private long m_nLastChatTime = 0;
-    private void DelayReply(Player player, String strMsg){
+    private void DelayReply(Player player, String strMsg) {
 
         int nBotNamePos = -1;
         String strCallName = "@" + m_strBotName;
