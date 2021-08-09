@@ -109,9 +109,40 @@ public class MTDChatBotPlugin extends Plugin{
 
         return result;
     }
+    private String AskAndGetReplyContent(String strAsk)
+    {
+        String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
+        String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
+        String strJsonReply = doGet(strURL);
+        //Log.info(m_strLogPrefix+strAsk);
+        //Log.info(m_strLogPrefix+strEncodedAsk);
+        String strFormattedContent = "";
+
+        if( m_nDebug == 1) {
+            Log.info(strJsonReply);
+        }
+        //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
+        //JSONObject json_test = JSONObject.fromObject(strReply);
+        final JSONObject jsonResult = new JSONObject(strJsonReply);
+
+        //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
+        //Log.info(m_strLogPrefix+jsonResult.getString("content"));
+        if (0 == jsonResult.getInt("result")) {
+            //Groups.player.find();
+            String strContent = jsonResult.getString("content");
+            strFormattedContent = strContent.replace("{br}", "\n");
+
+            //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
+            //text = text + "\n" + strMsgPrefix + strFormattedContent;
+        } else {
+            Log.info(m_strLogPrefix + " error getting message.");
+        }
+        return strFormattedContent;
+    }
 
     private String m_strLogPrefix = "[MykesTool:ChatBot]";
     private String m_strBotName = "myke";
+    private String m_strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]]:[white] ";
     private NetClient m_nc;
     private Player m_playerNew;
     private int m_nDebug = 0;
@@ -121,82 +152,56 @@ public class MTDChatBotPlugin extends Plugin{
 
         int nBotNamePos = -1;
         String strCallName = "@" + m_strBotName;
-        String strMsgPrefix = "[red][[[yellow]"+m_strBotName+"的小仆ff[red]]:[white] ";
         nBotNamePos = strMsg.indexOf(strCallName);
+
         //Log.info(text);
         //Log.info(nBotNamePos);
         if (nBotNamePos == 0) {
             String strAsk = strMsg.substring(strCallName.length());
-            String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
-            String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
-            String strReply = doGet(strURL);
-            //Log.info(m_strLogPrefix+strAsk);
-            //Log.info(m_strLogPrefix+strEncodedAsk);
+            String strFormattedReply = AskAndGetReplyContent(strAsk);
+            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
 
-            if( m_nDebug == 1) {
-                Log.info(strReply);
-            }
-            //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
-            //JSONObject json_test = JSONObject.fromObject(strReply);
-            final JSONObject jsonResult = new JSONObject(strReply);
-
-            //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
-            //Log.info(m_strLogPrefix+jsonResult.getString("content"));
-            if (0 == jsonResult.getInt("result")) {
-                //Groups.player.find();
-                String strContent = jsonResult.getString("content");
-                String strFormattedContent = strContent.replace("{br}", "\n");
-                //player.sendMessage(strMsgPrefix + strFormattedContent); // say to asker.
-                Call.sendMessage(strMsgPrefix + strFormattedContent); // say to all
-                Log.info(strMsgPrefix + strFormattedContent); // log this so we can trace back
-
-                //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
-                //text = text + "\n" + strMsgPrefix + strFormattedContent;
-            } else {
-                Log.info(m_strLogPrefix + " error getting message.");
-            }
             m_nLastChatTime = System.currentTimeMillis( );
         } // if has "@myke" prefix
-        else
+        else  if( Groups.player.size()<= m_nLessPeopleActive)
         {
-            if( Groups.player.size()<= m_nLessPeopleActive)
-            {
-                String strAsk = strMsg;
-                String strEncodedAsk = URLEncoder.encode(strAsk, StandardCharsets.UTF_8);
-                String strURL = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + strEncodedAsk;
-                String strReply = doGet(strURL);
-                //Log.info(m_strLogPrefix+strAsk);
-                //Log.info(m_strLogPrefix+strEncodedAsk);
+            String strAsk = strMsg;
+            String strFormattedReply = AskAndGetReplyContent(strAsk);
+            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+            m_nLastChatTime = System.currentTimeMillis( );
 
-                if( m_nDebug == 1) {
-                    Log.info(strReply);
-                }
-                //String json = "{\"2\":\"efg\",\"1\":\"abc\"}";
-                //JSONObject json_test = JSONObject.fromObject(strReply);
-                final JSONObject jsonResult = new JSONObject(strReply);
+        } else if(0 == strMsg.indexOf("无聊") || 0 == strMsg.indexOf("有点无聊") || 0 == strMsg.indexOf("好无聊")) {
 
-                //Log.info(m_strLogPrefix+jsonResult.getInt("result"));
-                //Log.info(m_strLogPrefix+jsonResult.getString("content"));
-                if (0 == jsonResult.getInt("result")) {
-                    //Groups.player.find();
-                    String strContent = jsonResult.getString("content");
-                    String strFormattedContent = strContent.replace("{br}", "\n");
-                    //player.sendMessage(strMsgPrefix + strFormattedContent); // say to asker.
-                    Call.sendMessage(strMsgPrefix + strFormattedContent); // say to all
-                    Log.info(strMsgPrefix + strFormattedContent); // log this so we can trace back
+            String strAsk = strMsg;
+            String strFormattedReply = AskAndGetReplyContent(strAsk);
+            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+            m_nLastChatTime = System.currentTimeMillis( );
+        }
+        else {
+            // otherwise, only see what he will reply, but not show them.
+            String strAsk = strMsg.substring(strCallName.length());
+            String strFormattedReply = AskAndGetReplyContent(strAsk);
+            //Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
 
-                    //Time.run(1, () -> player.sendMessage(strMsgPrefix + strFormattedContent));
-                    //text = text + "\n" + strMsgPrefix + strFormattedContent;
-                } else {
-                    Log.info(m_strLogPrefix + " error getting message.");
-                }
-                m_nLastChatTime = System.currentTimeMillis( );
-
-            }
+            //m_nLastChatTime = System.currentTimeMillis( );
 
         }
     }
 
+    String[] m_ArrayPossibleStart = {"天气如何？", "讲个笑话", "最近有什么新闻","."};
+    private void StartChat(Player player)
+    {
+        //int nPlayer = Mathf.random(Groups.player.size()-1);
+        //Player player = Groups.player.index(nPlayer);
+        int nStartMsg = Mathf.random(m_ArrayPossibleStart.length -1);
+        String strStartMsg = m_ArrayPossibleStart[nStartMsg];
+        Call.sendMessage(m_strMsgPrefix + "一个人的话，可以和机器人对话："+strStartMsg); // say to all
+        DelayReply(player, strStartMsg);
+    }
 
     //called when game initializes
     @Override
@@ -245,24 +250,39 @@ public class MTDChatBotPlugin extends Plugin{
 
         });
 
+        Events.on(PlayerLeave.class, event -> {
+            if(m_nDebug==1)
+            {
+                Log.info("[Myke's ChatBot] Player Left. player "+Groups.player.size()+":"+m_nLessPeopleActive);
+            }
+            // when a player leave and some one still in....
+            if( Groups.player.size() <= m_nLessPeopleActive && Groups.player.size() > 0)
+            {
+                // not * 60 is 1 sec
+                int nPlayer = Mathf.random(Groups.player.size()-1);
+                Player player = Groups.player.index(nPlayer);
+                Time.run(Mathf.random(10) * 60f, () -> StartChat(player));
+            }
+        });
+
+        /*
         Vars.netServer.admins.addActionFilter(action -> {
 
             // when user do any action
             long nNow = System.currentTimeMillis( );
             long nDiff = nNow - m_nLastChatTime;
             //Log.info("ndeiff." +  nDiff);
-            if( nDiff > (30+Mathf.random(30)) * 1000)
+            if( nDiff > (120+Mathf.random(480)) * 1000)
             {
                 if( Groups.player.size() <= m_nLessPeopleActive && Groups.player.size() > 0) {
                     m_nLastChatTime = System.currentTimeMillis( );
-                    int nPlayer = Mathf.random(Groups.player.size()-1);
-                    Player player = Groups.player.index(nPlayer);
-                    Time.run(Mathf.random(10) * 60f, () -> DelayReply(player, "随便说点什么吧。"));
+
+                    Time.run(Mathf.random(10) * 60f, () -> StartChat(action.player));
                 }
             }
             return true;
         });
-
+        */
 
     }
 
