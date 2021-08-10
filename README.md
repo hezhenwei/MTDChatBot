@@ -4,6 +4,7 @@ Used in Mindustry Server side.<br />
 You can chat with it.<br />
 say something start with "@myke"
 for example "@myke what do you like"
+It will also auto-chat when there are only 1 people in server.
 
 ### Installing
 Download here:<br/>
