@@ -119,9 +119,7 @@ public class MTDChatEngineThread extends Thread{
 
         public MTDChatEngineThread()
         {
-            Log.info("Start MTDChatEngine Thread");
-            m_nRunning = 1;
-            this.start();
+            Log.info("Init MTDChatEngine Thread");
         }
 
         // note this may be called in another thread.
@@ -135,7 +133,8 @@ public class MTDChatEngineThread extends Thread{
         if( m_nDebug == 1) {
             Log.info("Insert chat:"+player.toString()+":"+strAsk);
         }
-        // if it's stopped because of server stop, restart it.
+        // start it here. becuase if we don't know when to exit, we check if hosting to exit.
+        // but if it host later after program start, the thread exit before it hosts.
         if(m_nRunning == 0)
         {
             m_nRunning =1;
@@ -147,14 +146,14 @@ public class MTDChatEngineThread extends Thread{
     public ChatReply GetNextReply()
     {
         ChatReply chat = null;
-        Log.info("trying to get reply:");
+        //Log.info("trying to get reply:");
         synchronized (m_ListReply) {
             // find the one that has not get replied.
             for (ChatReply chatOne:m_ListReply) {
-                Log.info("itering reply:"+chatOne.strReply);
+                //Log.info("itering reply:"+chatOne.strReply);
                 if( "" != chatOne.strReply) {
                     chat = chatOne;
-                    Log.info("find reply:"+chatOne.strReply);
+                    //Log.info("find reply:"+chatOne.strReply);
                     m_ListReply.remove(chatOne);
                     break;
                 }
@@ -213,9 +212,9 @@ public class MTDChatEngineThread extends Thread{
                             Log.info(m_strLogPrefix + " error getting message.");
                         }
                         chat.strReply = strFormattedContent;
-                        Log.info("adding chat reply "+chat);
+                        //Log.info("adding chat reply "+chat);
                         synchronized (m_ListReply) {
-                            Log.info("adding chat reply2 "+chat);
+                            //Log.info("adding chat reply2 "+chat);
                             m_ListReply.add(chat);
                         }
                     }
