@@ -151,45 +151,48 @@ public class MTDChatBotPlugin extends Plugin{
     private long m_nLastChatTime = 0;
     private void DelayReply(Player player, String strMsg) {
 
-        int nBotNamePos = -1;
-        String strCallName = "@" + m_strBotName;
-        nBotNamePos = strMsg.indexOf(strCallName);
+        try {
+            int nBotNamePos = -1;
+            String strCallName = "@" + m_strBotName;
+            nBotNamePos = strMsg.indexOf(strCallName);
 
-        //Log.info(text);
-        //Log.info(nBotNamePos);
-        if (nBotNamePos == 0) {
-            String strAsk = strMsg.substring(strCallName.length());
-            String strFormattedReply = AskAndGetReplyContent(strAsk);
-            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
-            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+            //Log.info(text);
+            //Log.info(nBotNamePos);
+            if (nBotNamePos == 0) {
+                String strAsk = strMsg.substring(strCallName.length());
+                String strFormattedReply = AskAndGetReplyContent(strAsk);
+                Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+                Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
 
-            m_nLastChatTime = System.currentTimeMillis( );
-        } // if has "@myke" prefix
-        else  if( Groups.player.size()<= m_nLessPeopleActive)
+                m_nLastChatTime = System.currentTimeMillis();
+            } // if has "@myke" prefix
+            else if (Groups.player.size() <= m_nLessPeopleActive) {
+                String strAsk = strMsg;
+                String strFormattedReply = AskAndGetReplyContent(strAsk);
+                Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+                Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+                m_nLastChatTime = System.currentTimeMillis();
+
+            } else if (0 == strMsg.indexOf("无聊") || 0 == strMsg.indexOf("有点无聊") || 0 == strMsg.indexOf("好无聊")) {
+
+                String strAsk = strMsg;
+                String strFormattedReply = AskAndGetReplyContent(strAsk);
+                Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+                Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+                m_nLastChatTime = System.currentTimeMillis();
+            } else {
+                // otherwise, only see what he will reply, but not show them.
+                String strAsk = strMsg;
+                String strFormattedReply = AskAndGetReplyContent(strAsk);
+                //Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
+                Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
+
+                //m_nLastChatTime = System.currentTimeMillis( );
+
+            }
+        }catch ( Exception e)
         {
-            String strAsk = strMsg;
-            String strFormattedReply = AskAndGetReplyContent(strAsk);
-            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
-            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
-            m_nLastChatTime = System.currentTimeMillis( );
-
-        } else if(0 == strMsg.indexOf("无聊") || 0 == strMsg.indexOf("有点无聊") || 0 == strMsg.indexOf("好无聊")) {
-
-            String strAsk = strMsg;
-            String strFormattedReply = AskAndGetReplyContent(strAsk);
-            Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
-            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
-            m_nLastChatTime = System.currentTimeMillis( );
-        }
-        else {
-            // otherwise, only see what he will reply, but not show them.
-            String strAsk = strMsg.substring(strCallName.length());
-            String strFormattedReply = AskAndGetReplyContent(strAsk);
-            //Call.sendMessage(m_strMsgPrefix + strFormattedReply); // say to all
-            Log.info(m_strMsgPrefix + strFormattedReply); // log this so we can trace back
-
-            //m_nLastChatTime = System.currentTimeMillis( );
-
+            e.printStackTrace();
         }
     }
 
